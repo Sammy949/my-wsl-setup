@@ -1,6 +1,6 @@
 # ⚙️ My WSL Terminal Setup
 
-Welcome to my custom WSL setup guide. This repo contains all the steps, commands, and tools I used to make my Ubuntu (WSL) terminal clean, fast, and visually stunning.
+This here is my custom WSL setup guide. This repo contains all the steps, commands, and tools I used to make my Ubuntu (WSL) terminal clean, fast, and visually stunning.
 
 ---
 
