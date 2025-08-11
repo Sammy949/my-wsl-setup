@@ -1,6 +1,6 @@
 # ⚙️ My WSL Terminal Setup
 
-This here is my custom WSL setup guide. This repo contains all the steps, commands, and tools I used to make my Ubuntu (WSL) terminal clean, fast, and visually stunning.
+This guide will take you from a fresh **Windows Subsystem for Linux (WSL)** install to a fully customised Ubuntu terminal with **zsh**, **Oh My Zsh**, and **Oh My Posh**.
 
 ---
 
@@ -15,133 +15,170 @@ Make the WSL terminal:
 
 ---
 
-## 🚀 Setup Instructions
+## 1. Installing WSL
 
-### 1. 🧰 Install essential tools
-
-```bash
-sudo apt update && sudo apt install -y \
-  zsh git curl wget bat eza htop ncdu neofetch fonts-powerline
+### Enable WSL
+Open **PowerShell** as Administrator and run:
+```powershell
+wsl --install
 ```
-
-> Note: On some Ubuntu versions, `bat` is installed as `batcat`. I aliased it later.
+This will:
+- Install WSL 2
+- Install Ubuntu (default) unless specified otherwise
 
 ---
 
-### 2. 🧪 Set Zsh as your default shell
+### Install a Specific Distro (Ubuntu)
+```powershell
+wsl --install -d Ubuntu
+```
+If you get a `0x80072ee2` timeout error:
+- Connect to a **VPN** and try again (this can happen if Microsoft/GitHub servers are blocked).
 
+---
+
+### First-Time Ubuntu Setup
+When Ubuntu launches for the first time, it will prompt you for:
+- **Username**
+- **Password**
+  
+Example:
+```plaintext
+Create a default Unix user account: samuel
+New password:
+Retype new password:
+```
+
+---
+
+## 2. Preparing Ubuntu
+
+Update and upgrade packages:
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+---
+
+## 3. Installing and Setting zsh
+
+Install zsh:
+```bash
+sudo apt install zsh -y
+```
+
+Set zsh as the default shell:
 ```bash
 chsh -s $(which zsh)
 ```
 
+Restart WSL:
+```bash
+exit
+wsl
+```
+
 ---
 
-### 3. 🌟 Install Oh My Zsh
+## 4. Installing Oh My Zsh
 
+Run:
 ```bash
-export RUNZSH=no
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
+Press **Y** when prompted to change your default shell.
 
 ---
 
-### 4. 💎 Install Powerlevel10k theme
+## 5. Installing Oh My Posh
 
+Download and install Oh My Posh:
 ```bash
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
-  ~/.oh-my-zsh/custom/themes/powerlevel10k
+sudo wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-linux-amd64 -O /usr/local/bin/oh-my-posh
+sudo chmod +x /usr/local/bin/oh-my-posh
 ```
 
 ---
 
-### 5. 🔌 (Optional) Zsh Plugins
+## 6. Installing Oh My Posh Themes
 
+Create the theme folder:
 ```bash
-git clone https://github.com/zsh-users/zsh-autosuggestions \
-  ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
-
-git clone https://github.com/zsh-users/zsh-syntax-highlighting \
-  ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+mkdir ~/.poshthemes
 ```
 
----
-
-### 6. 📝 `.zshrc` Configuration
-
-Here's the config I use:
-
-```zsh
-export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="powerlevel10k/powerlevel10k"
-
-plugins=(
-  git
-  sudo
-  zsh-autosuggestions
-  zsh-syntax-highlighting
-)
-
-source $ZSH/oh-my-zsh.sh
-
-# Aliases
-alias bat='batcat'
-alias ls='eza -al --color=always --group-directories-first --icons'
-alias sys='neofetch'
-alias dux='ncdu'
-```
-
-Save that to your `~/.zshrc` file.
-
----
-
-### 7. 🎨 Customise Powerlevel10k
-
-After restarting the terminal, run:
-
+Download themes:
 ```bash
-p10k configure
+wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/themes.zip -O ~/.poshthemes/themes.zip
+sudo apt install unzip -y
+unzip ~/.poshthemes/themes.zip -d ~/.poshthemes
+chmod u+rw ~/.poshthemes/*.omp.*
+rm ~/.poshthemes/themes.zip
 ```
 
-Then pick your preferred style (I used the **arrow-backed** style to match PowerShell's Oh My Posh layout).
-
 ---
 
-## 📦 Optional Tools I Installed
+## 7. Configuring zsh to Use Oh My Posh
 
-| Tool       | Use Case            |
-|------------|---------------------|
-| `eza`      | Modern `ls`         |
-| `bat`      | Modern `cat`        |
-| `ncdu`     | Disk usage viewer   |
-| `neofetch` | System info summary |
-| `htop`     | Process viewer      |
-
----
-
-## 📁 Backup Configs
-
-I keep my configs backed up:
-
+Open `.zshrc`:
 ```bash
-mkdir -p ~/terminal-configs
-cp ~/.zshrc ~/.p10k.zsh ~/.oh-my-zsh/themes/powerlevel10k/powerlevel10k.zsh-theme ~/terminal-configs/
+nano ~/.zshrc
 ```
 
-Then I `git init` and push it to this repo.
+Add the following line at the end (you can change the theme later):
+```bash
+eval "$(oh-my-posh init zsh --config ~/.poshthemes/jandedobbeleer.omp.json)"
+```
+
+Save (`CTRL+O`, Enter) and exit (`CTRL+X`).
+
+Reload zsh:
+```bash
+source ~/.zshrc
+```
 
 ---
 
-## 🐧 Launching WSL
+## 8. Optional: Install Useful zsh Plugins
 
-Just type `wsl` in your Windows Run dialog (`Win + R`) or any terminal to start your Linux shell.
+### Autosuggestions
+```bash
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+```
+
+### Syntax Highlighting
+```bash
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+```
+
+Enable them in `.zshrc`:
+```bash
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+```
+
+Reload:
+```bash
+source ~/.zshrc
+```
 
 ---
 
-## 🤝 License
-
-MIT — feel free to copy, tweak, or fork this setup.
+## Final Result
+You now have:
+- WSL Ubuntu
+- zsh as your default shell
+- Oh My Zsh for shell configuration
+- Oh My Posh for a beautiful prompt
+- Optional plugins for extra functionality
 
 ---
+
+## Key Takeaways
+- WSL runs Linux on Windows without a VM.
+- zsh offers powerful shell features.
+- Oh My Zsh simplifies zsh management.
+- Oh My Posh makes your terminal visually appealing.
+- Plugins improve productivity.
 
 ## 🧑‍💻 Author
 
